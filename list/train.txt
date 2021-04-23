@@ -1,0 +1,15 @@
+train_image/0011.png
+train_image/0004.png
+train_image/0018.png
+train_image/0005.png
+train_image/0012.png
+train_image/0016.png
+train_image/0015.png
+train_image/0001.png
+train_image/0013.png
+train_image/0002.png
+train_image/0003.png
+train_image/0010.png
+train_image/0007.png
+train_image/0006.png
+train_image/0014.png

@@ -1,0 +1,15 @@
+train_image/0011.png label/0011_label.png 1 1 1 1
+train_image/0004.png label/0004_label.png 1 1 1 1
+train_image/0018.png label/0018_label.png 1 1 1 1
+train_image/0005.png label/0005_label.png 1 1 1 1
+train_image/0012.png label/0012_label.png 1 1 1 1
+train_image/0016.png label/0016_label.png 1 1 1 1
+train_image/0015.png label/0015_label.png 1 1 1 1
+train_image/0001.png label/0001_label.png 1 1 1 1
+train_image/0013.png label/0013_label.png 1 1 1 1
+train_image/0002.png label/0002_label.png 1 1 1 1
+train_image/0003.png label/0003_label.png 1 1 1 1
+train_image/0010.png label/0010_label.png 1 1 1 1
+train_image/0007.png label/0007_label.png 1 1 1 1
+train_image/0006.png label/0006_label.png 1 1 1 1
+train_image/0014.png label/0014_label.png 1 1 1 1
