@@ -1,0 +1,20 @@
+img_path: gt_data            # path to all images
+jsons: json             # path to your json files
+annotations: annotations        # json_to_dataset.py output path
+
+dataset: /SDC1/home/panwh/transfer-to-culane                 # dataset root path, eg. /data/panwh/lane-detection-data/unsplit 
+culane_annotations: culane_annotations  # path to xxxx.lines.txt files
+label_path: label              # path to xxxx_label.png files
+train_img: train_image         
+val_img: val_image
+test_img: test_image
+list_path: list                # including train.txt train_gt.txt val.txt val_gt.txt test.txt
+train_gt: train_gt.txt
+val_gt: val_gt.txt
+train: train.txt
+val: val.txt
+test: test.txt
+
+test_rate: 0.2
+val_rate: 0.1
+cls_num: 4

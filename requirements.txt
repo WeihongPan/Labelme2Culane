@@ -1,0 +1,8 @@
+labelme
+imgviz
+pyqt5
+opencv-python
+pillow
+numpy
+yaml
+argparse
