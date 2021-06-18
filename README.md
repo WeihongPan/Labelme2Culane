@@ -15,7 +15,7 @@ pip install -r requirements.txt
 
 ### Run
 ```python
-python labelme_to_culane.py
+python Labelme2Culane.py
 ```
 
 Any issues are welcomed
