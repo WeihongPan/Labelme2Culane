@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import argparse
 import yaml
+import random
 
 culane_row_anchor = [121, 131, 141, 150, 160, 170, 180, 189, 199, 209, 219, 228, 238, 248, 258, 267, 277, 287]
 
@@ -19,7 +20,7 @@ def create_annotations(jsons, annotations):
         save_path = osp.join(annotations, name[:-5])
         os.system("python json_to_dataset.py " + json_data + " -o " + save_path)
 
-def generate_image_set(img_path, dataset, target_path, record_file, ids):
+def generate_image_set(img_path, dataset, target_path, record_file, ids, image_names, image_prefixes):
     target_path_full = osp.join(dataset, target_path)
     if not osp.exists(target_path_full):
         os.mkdir(target_path_full)
@@ -27,29 +28,34 @@ def generate_image_set(img_path, dataset, target_path, record_file, ids):
     lines = ""
     for id in ids:   
         # check.append(id)     
-        name = osp.join(img_path, str(id).zfill(4)+'.jpg')
+        # name = osp.join(img_path, str(id).zfill(6)+'.jpg')\
+        name = osp.join(img_path, image_names[id])
         img = cv2.imread(name)
-        cv2.imwrite(osp.join(target_path_full, str(id).zfill(4)+'.png'), img)
+        # cv2.imwrite(osp.join(target_path_full, str(id).zfill(4)+'.png'), img)
+        cv2.imwrite(osp.join(target_path_full, image_prefixes[id] + '.png'), img)
         print(name)
-        lines = lines + osp.join(target_path, str(id).zfill(4)+'.png')+'\n'
+        lines = lines + osp.join(target_path, image_prefixes[id] + '.png')+'\n'
 
     with open(record_file, 'w') as f:
         f.write(lines)
 
-def generate_label_set(annotations, dataset, img_path, label_path, record_file, ids, cls_num):
+def generate_label_set(annotations, dataset, img_path, label_path, record_file, ids, cls_num, image_prefixes):
     label_path_full = osp.join(dataset, label_path)
     if not osp.exists(label_path_full):
         os.mkdir(label_path_full)
     lines = ""
     for id in ids:        
-        anno = osp.join(annotations, str(id).zfill(4), 'label.png')
+        # anno = osp.join(annotations, str(id).zfill(4), 'label.png')
+        anno = osp.join(annotations, image_prefixes[id], 'label.png')
         label = Image.open(anno)
         label_data = np.asanyarray(label)
         pix = np.unique(label_data)
         label = Image.fromarray(label_data)
-        label.save(osp.join(label_path_full, str(id).zfill(4)+'_label.png'))
+        # label.save(osp.join(label_path_full, str(id).zfill(4)+'_label.png'))
+        label.save(osp.join(label_path_full, image_prefixes[id]+'_label.png'))
         
-        line = osp.join(img_path, str(id).zfill(4)+'.png') + ' ' + osp.join(label_path, str(id).zfill(4)+'_label.png')
+        # line = osp.join(img_path, str(id).zfill(4)+'.png') + ' ' + osp.join(label_path, str(id).zfill(4)+'_label.png')
+        line = osp.join(img_path, image_prefixes[id]+'.png') + ' ' + osp.join(label_path, image_prefixes[id]+'_label.png')
         for i in range (1, cls_num+1):
             if i in pix:
                 line = line + ' 1'
@@ -59,9 +65,10 @@ def generate_label_set(annotations, dataset, img_path, label_path, record_file, 
     with open(record_file, 'w') as f:
         f.write(lines)
 
-def generate_culane_annotations(annotations, dataset, img_path, ids, cls_num):
+def generate_culane_annotations(annotations, dataset, img_path, ids, cls_num, image_prefixes):
     for id in ids:
-        label_path = osp.join(annotations, str(id).zfill(4), "label.png")
+        # label_path = osp.join(annotations, str(id).zfill(4), "label.png")
+        label_path = osp.join(annotations, image_prefixes[id], "label.png")
         label = Image.open(label_path)            
         w, h = label.size
 
@@ -85,12 +92,12 @@ def generate_culane_annotations(annotations, dataset, img_path, ids, cls_num):
         # print("({}): ".format(id))
         # print(lines)
 
-        txt_path = osp.join(dataset, img_path, str(id).zfill(4)+'.lines.txt')
+        txt_path = osp.join(dataset, img_path, image_prefixes[id]+'.lines.txt')
         with open(txt_path, 'w') as f:
             f.write(lines)
 
 if __name__ == '__main__':
-    config = yaml.load(open('config.yaml').read())
+    config = yaml.load(open('config.yaml').read(), Loader=yaml.FullLoader)
 
     img_path            = config['img_path']
     jsons               = config['jsons']
@@ -154,6 +161,17 @@ if __name__ == '__main__':
     print('------------divide images into train/val/test-------------')
     dataset_size = len(os.listdir(jsons))
     print('dataset size: %d' % dataset_size)
+
+    # 修复当文件名不连续或者不是数字
+    image_names = []
+    image_prefixes = []
+    for name in os.listdir(img_path):
+        _, temp_name = os.path.split(name)
+        prefix, suffix = os.path.splitext(temp_name)
+        image_names.append(temp_name)
+        image_prefixes.append(prefix)
+    
+
     test_size = int(dataset_size * test_rate)
     val_size = int((dataset_size - test_size) * val_rate)
     train_size = dataset_size - test_size - val_size
@@ -170,22 +188,22 @@ if __name__ == '__main__':
 
     print('------------------generate image set-----------------------')
     print('train set...')
-    generate_image_set(img_path, dataset, train_img, train, train_ids)
+    generate_image_set(img_path, dataset, train_img, train, train_ids, image_names, image_prefixes)
     print('val set...')
-    generate_image_set(img_path, dataset, val_img, val, val_ids)
+    generate_image_set(img_path, dataset, val_img, val, val_ids, image_names, image_prefixes)
     print('test set...')
-    generate_image_set(img_path, dataset, test_img, test, test_ids)
+    generate_image_set(img_path, dataset, test_img, test, test_ids, image_names, image_prefixes)
     
     print('------------------generate label set-----------------------')
     print('train set...')
-    generate_label_set(annotations, dataset, train_img, label_path, train_gt, train_ids, cls_num)
+    generate_label_set(annotations, dataset, train_img, label_path, train_gt, train_ids, cls_num, image_prefixes)
     print('val set...')
-    generate_label_set(annotations, dataset, val_img, label_path, val_gt, val_ids, cls_num)
+    generate_label_set(annotations, dataset, val_img, label_path, val_gt, val_ids, cls_num, image_prefixes)
 
     print('--------------generate culane annotations------------------')
     print('train set...')
-    generate_culane_annotations(annotations, dataset, train_img, train_ids, cls_num)
+    generate_culane_annotations(annotations, dataset, train_img, train_ids, cls_num, image_prefixes)
     print('val set...')
-    generate_culane_annotations(annotations, dataset, val_img, val_ids, cls_num)
+    generate_culane_annotations(annotations, dataset, val_img, val_ids, cls_num, image_prefixes)
     print('test set...')
-    generate_culane_annotations(annotations, dataset, test_img, test_ids, cls_num)
+    generate_culane_annotations(annotations, dataset, test_img, test_ids, cls_num, image_prefixes)
