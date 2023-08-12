@@ -20,7 +20,7 @@ def create_annotations(jsons, annotations):
         save_path = osp.join(annotations, name[:-5])
         os.system("python json_to_dataset.py " + json_data + " -o " + save_path)
 
-def generate_image_set(img_path, dataset, target_path, record_file, ids,image_names):
+def generate_image_set(img_path, dataset, target_path, record_file, ids, image_names, image_prefixes):
     target_path_full = osp.join(dataset, target_path)
     if not osp.exists(target_path_full):
         os.mkdir(target_path_full)
@@ -32,9 +32,9 @@ def generate_image_set(img_path, dataset, target_path, record_file, ids,image_na
         name = osp.join(img_path, image_names[id])
         img = cv2.imread(name)
         # cv2.imwrite(osp.join(target_path_full, str(id).zfill(4)+'.png'), img)
-        cv2.imwrite(osp.join(target_path_full, name), img)
+        cv2.imwrite(osp.join(target_path_full, image_prefixes[id] + '.png'), img)
         print(name)
-        lines = lines + osp.join(target_path, name)+'\n'
+        lines = lines + osp.join(target_path, image_prefixes[id] + '.png')+'\n'
 
     with open(record_file, 'w') as f:
         f.write(lines)
@@ -188,11 +188,11 @@ if __name__ == '__main__':
 
     print('------------------generate image set-----------------------')
     print('train set...')
-    generate_image_set(img_path, dataset, train_img, train, train_ids, image_names)
+    generate_image_set(img_path, dataset, train_img, train, train_ids, image_names, image_prefixes)
     print('val set...')
-    generate_image_set(img_path, dataset, val_img, val, val_ids, image_names)
+    generate_image_set(img_path, dataset, val_img, val, val_ids, image_names, image_prefixes)
     print('test set...')
-    generate_image_set(img_path, dataset, test_img, test, test_ids, image_names)
+    generate_image_set(img_path, dataset, test_img, test, test_ids, image_names, image_prefixes)
     
     print('------------------generate label set-----------------------')
     print('train set...')
